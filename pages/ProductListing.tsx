@@ -27,7 +27,8 @@ const ProductListing: React.FC = () => {
     return MOCK_PRODUCTS.filter(product => {
       const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
       const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      // Refined matching: Starts with the query
+      const matchesSearch = product.name.toLowerCase().startsWith(searchQuery.toLowerCase());
       return matchesCategory && matchesPrice && matchesSearch;
     }).sort((a, b) => {
       if (sortBy === 'Price: Low to High') return a.price - b.price;
@@ -72,7 +73,7 @@ const ProductListing: React.FC = () => {
               placeholder="Filter results..." 
               value={searchQuery}
               onChange={handleLocalSearch}
-              className="pl-11 pr-4 py-3 bg-white border border-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-100 focus:border-pink-400 transition-all w-full sm:w-64 shadow-sm"
+              className="pl-11 pr-4 py-3 bg-white border border-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-100 focus:border-pink-400 transition-all w-full sm:w-64 shadow-sm text-pink-400"
             />
           </div>
           
@@ -180,7 +181,7 @@ const ProductListing: React.FC = () => {
             </div>
           ) : (
             <div className="py-32 text-center bg-white rounded-[3rem] border border-dashed border-gray-200">
-              <p className="text-gray-400 mb-4">No products match your search "<span className="text-pink-400 font-bold">{searchQuery}</span>".</p>
+              <p className="text-gray-400 mb-4">No products starting with "<span className="text-pink-400 font-bold">{searchQuery}</span>".</p>
               <button 
                 onClick={() => { 
                   setSelectedCategory('All'); 
