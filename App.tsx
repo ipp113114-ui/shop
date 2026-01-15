@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import ProductListing from './pages/ProductListing';
 import ProductDetail from './pages/ProductDetail';
+import Checkout from './pages/Checkout';
 import CartDrawer from './components/CartDrawer';
 import AIStylist from './components/AIStylist';
 import { Product, CartItem, ToastMessage } from './types';
@@ -56,6 +57,11 @@ const App: React.FC = () => {
     addToast('Item removed from cart', 'info');
   };
 
+  const handleOrderComplete = () => {
+    setCart([]);
+    addToast('Order placed successfully!', 'success');
+  };
+
   return (
     <Router>
       <div className="min-h-screen flex flex-col selection:bg-pink-100 selection:text-pink-600">
@@ -66,9 +72,9 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<ProductListing />} />
             <Route path="/products/:id" element={<ProductDetail onAddToCart={handleAddToCart} />} />
-            <Route path="/checkout" element={<div className="py-40 text-center"><h1 className="text-3xl font-bold">Coming Soon</h1><p>Our checkout is being finalized for your luxury experience.</p></div>} />
-            <Route path="/auth" element={<div className="py-40 text-center"><h1 className="text-3xl font-bold">Customer Portal</h1><p>Secure login coming soon.</p></div>} />
-            <Route path="/about" element={<div className="py-40 text-center px-6"><h1 className="text-3xl font-bold mb-4">Our Story</h1><p className="max-w-xl mx-auto">Founded in 2025, Lumière brings the essence of modern light to fashion. We believe in transparency, quality, and timeless elegance.</p></div>} />
+            <Route path="/checkout" element={<Checkout items={cart} onOrderComplete={handleOrderComplete} />} />
+            <Route path="/auth" element={<div className="py-40 text-center px-4"><h1 className="text-4xl font-bold text-gray-900 mb-4">Account Access</h1><p className="text-gray-500 max-w-sm mx-auto">Sign in to track your orders and manage your style preferences.</p><button className="mt-8 px-10 py-4 bg-gray-900 text-white rounded-full font-bold">Sign In</button></div>} />
+            <Route path="/about" element={<div className="py-40 text-center px-6"><h1 className="text-4xl font-bold mb-4 text-gray-900">Our Story</h1><p className="max-w-xl mx-auto text-gray-500 leading-relaxed">Founded in 2025, Lumière brings the essence of modern light to fashion. We believe in transparency, premium quality, and effortless elegance for everyone.</p></div>} />
           </Routes>
         </main>
 
@@ -84,7 +90,7 @@ const App: React.FC = () => {
                 </p>
                 <div className="flex space-x-4">
                   {[1,2,3,4].map(i => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-pink-100 hover:text-pink-400 cursor-pointer transition-colors" />
+                    <div key={i} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-pink-50 hover:text-pink-400 cursor-pointer transition-all border border-gray-100" />
                   ))}
                 </div>
               </div>
@@ -137,11 +143,11 @@ const App: React.FC = () => {
           {toasts.map(toast => (
             <div 
               key={toast.id} 
-              className={`pointer-events-auto flex items-center justify-between min-w-[300px] px-6 py-4 rounded-2xl shadow-xl animate-in slide-in-from-left duration-300 ${
-                toast.type === 'success' ? 'bg-gray-900 text-white' : 'bg-pink-100 text-pink-700'
+              className={`pointer-events-auto flex items-center justify-between min-w-[300px] px-6 py-4 rounded-2xl shadow-2xl animate-in slide-in-from-left duration-300 border border-white/20 backdrop-blur-lg ${
+                toast.type === 'success' ? 'bg-gray-900/90 text-white' : 'bg-pink-400 text-white'
               }`}
             >
-              <span className="text-sm font-medium">{toast.message}</span>
+              <span className="text-sm font-bold tracking-tight">{toast.message}</span>
               <button onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))} className="ml-4 opacity-70 hover:opacity-100">
                 <X size={16} />
               </button>
