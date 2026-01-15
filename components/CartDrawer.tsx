@@ -68,7 +68,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, items, onUpdat
                                 >
                                   <Minus size={14} />
                                 </button>
-                                <span className="mx-3 font-medium">{item.quantity}</span>
+                                <span className="mx-3 font-bold text-black">{item.quantity}</span>
                                 <button 
                                   onClick={() => onUpdateQuantity(item.id, item.selectedColor, item.selectedSize, 1)}
                                   className="p-1 hover:text-pink-400"

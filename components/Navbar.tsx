@@ -17,6 +17,8 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchToggleButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -28,6 +30,24 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart }) => {
     if (isSearchOpen && searchInputRef.current) {
       searchInputRef.current.focus();
     }
+  }, [isSearchOpen]);
+
+  // Click outside listener
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isSearchOpen && 
+        searchContainerRef.current && 
+        !searchContainerRef.current.contains(event.target as Node) &&
+        searchToggleButtonRef.current &&
+        !searchToggleButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isSearchOpen]);
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
@@ -88,6 +108,7 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart }) => {
             {/* Icons */}
             <div className="flex items-center space-x-2">
               <button 
+                ref={searchToggleButtonRef}
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className={`transition-all p-2 rounded-full ${isSearchOpen ? 'bg-pink-100 text-pink-500' : 'text-gray-900 hover:text-pink-400 hover:bg-pink-50'}`}
               >
@@ -112,7 +133,10 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart }) => {
         </div>
 
         {/* Compact Search Slide-down */}
-        <div className={`absolute top-full left-0 w-full bg-white border-b border-pink-50 overflow-hidden transition-all duration-300 ease-in-out shadow-lg ${isSearchOpen ? 'max-h-96 py-6 opacity-100' : 'max-h-0 py-0 opacity-0'}`}>
+        <div 
+          ref={searchContainerRef}
+          className={`absolute top-full left-0 w-full bg-white border-b border-pink-50 overflow-hidden transition-all duration-300 ease-in-out shadow-lg ${isSearchOpen ? 'max-h-96 py-6 opacity-100' : 'max-h-0 py-0 opacity-0'}`}
+        >
           <div className="max-w-3xl mx-auto px-6">
             <form onSubmit={handleSearchSubmit} className="relative flex items-center mb-4">
               <input 

@@ -138,11 +138,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-6">
               <div className="flex items-center border-2 border-gray-100 rounded-2xl px-5 py-3 bg-white h-14 shadow-sm">
                 <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-1 hover:text-pink-400 transition-colors">
-                  <Minus size={18} />
+                  <span className="text-gray-400 hover:text-pink-400"><Minus size={18} /></span>
                 </button>
-                <span className="mx-8 font-bold w-4 text-center text-lg">{quantity}</span>
+                <span className="mx-8 font-bold w-4 text-center text-lg text-black">{quantity}</span>
                 <button onClick={() => setQuantity(q => q + 1)} className="p-1 hover:text-pink-400 transition-colors">
-                  <Plus size={18} />
+                  <span className="text-gray-400 hover:text-pink-400"><Plus size={18} /></span>
                 </button>
               </div>
               <button 
