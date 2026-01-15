@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Lumière Fashion - Modern E-commerce",
+  "description": "A premium fashion e-commerce platform featuring a clean aesthetic, full shopping cart functionality, AI stylist assistant, and a seamless responsive design.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
