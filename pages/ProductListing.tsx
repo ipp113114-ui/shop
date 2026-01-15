@@ -1,17 +1,27 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Filter, Search, ChevronDown, SlidersHorizontal, Sparkles } from 'lucide-react';
 import { MOCK_PRODUCTS, CATEGORIES } from '../constants';
 import { Link, useSearchParams } from 'react-router-dom';
 
 const ProductListing: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || 'All';
+  const queryParam = searchParams.get('q') || '';
   
   const [selectedCategory, setSelectedCategory] = useState(categoryParam);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [sortBy, setSortBy] = useState('Featured');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(queryParam);
+
+  // Sync state if URL changes (e.g., from Navbar search)
+  useEffect(() => {
+    setSearchQuery(queryParam);
+  }, [queryParam]);
+
+  useEffect(() => {
+    setSelectedCategory(categoryParam);
+  }, [categoryParam]);
 
   const filteredProducts = useMemo(() => {
     return MOCK_PRODUCTS.filter(product => {
@@ -27,11 +37,30 @@ const ProductListing: React.FC = () => {
     });
   }, [selectedCategory, priceRange, sortBy, searchQuery]);
 
+  const handleLocalSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    // Update URL without a full page reload to keep it in sync
+    const newParams = new URLSearchParams(searchParams);
+    if (val) {
+      newParams.set('q', val);
+    } else {
+      newParams.delete('q');
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Shop All <span className="text-pink-400">Collections</span></h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            {searchQuery ? (
+              <>Search Results for <span className="text-pink-400 italic">"{searchQuery}"</span></>
+            ) : (
+              <>Shop All <span className="text-pink-400">Collections</span></>
+            )}
+          </h1>
           <p className="text-gray-500 font-medium">{filteredProducts.length} items curated for you</p>
         </div>
 
@@ -40,9 +69,9 @@ const ProductListing: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input 
               type="text" 
-              placeholder="Search products..." 
+              placeholder="Filter results..." 
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleLocalSearch}
               className="pl-11 pr-4 py-3 bg-white border border-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-100 focus:border-pink-400 transition-all w-full sm:w-64 shadow-sm"
             />
           </div>
@@ -71,14 +100,19 @@ const ProductListing: React.FC = () => {
         {/* Filters Sidebar */}
         <aside className="w-full lg:w-64 flex-shrink-0 space-y-10">
           <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-8 flex items-center">
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 mb-8 flex items-center">
               <Filter size={16} className="mr-2 text-pink-400" /> Categories
             </h3>
             <div className="space-y-4">
               {CATEGORIES.map(cat => (
                 <button 
                   key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    const newParams = new URLSearchParams(searchParams);
+                    newParams.set('category', cat);
+                    setSearchParams(newParams);
+                  }}
                   className={`block w-full text-left text-sm transition-all relative ${
                     selectedCategory === cat ? 'text-pink-400 font-bold pl-4' : 'text-gray-500 hover:text-gray-900 pl-0'
                   }`}
@@ -91,7 +125,7 @@ const ProductListing: React.FC = () => {
           </div>
 
           <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-8 flex items-center">
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 mb-8 flex items-center">
               <SlidersHorizontal size={16} className="mr-2 text-pink-400" /> Price Range
             </h3>
             <div className="space-y-6">
@@ -146,9 +180,14 @@ const ProductListing: React.FC = () => {
             </div>
           ) : (
             <div className="py-32 text-center bg-white rounded-[3rem] border border-dashed border-gray-200">
-              <p className="text-gray-400 mb-4">No products match your filters.</p>
+              <p className="text-gray-400 mb-4">No products match your search "<span className="text-pink-400 font-bold">{searchQuery}</span>".</p>
               <button 
-                onClick={() => { setSelectedCategory('All'); setPriceRange([0, 500]); setSearchQuery(''); }}
+                onClick={() => { 
+                  setSelectedCategory('All'); 
+                  setPriceRange([0, 500]); 
+                  setSearchQuery(''); 
+                  setSearchParams({}); 
+                }}
                 className="text-pink-400 font-bold hover:underline"
               >
                 Clear all filters
